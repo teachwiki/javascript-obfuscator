@@ -11,19 +11,13 @@ import { IRandomGenerator } from '../../interfaces/utils/IRandomGenerator';
 
 import { initializable } from '../../decorators/Initializable';
 
-import { DebugProtectionFunctionCallTemplate } from './templates/debug-protection-function-call/DebugProtectionFunctionCallTemplate';
+import { DebugProtectionFunctionIntervalTemplate } from './templates/debug-protection-function-interval/DebugProtectionFunctionIntervalTemplate';
 
 import { AbstractCustomCodeHelper } from '../AbstractCustomCodeHelper';
 import { NodeUtils } from '../../node/NodeUtils';
 
 @injectable()
-export class DebugProtectionFunctionCallCodeHelper extends AbstractCustomCodeHelper {
-    /**
-     * @type {string}
-     */
-    @initializable()
-    private callsControllerFunctionName!: string;
-
+export class DebugProtectionFunctionIntervalCodeHelper extends AbstractCustomCodeHelper {
     /**
      * @type {string}
      */
@@ -56,11 +50,9 @@ export class DebugProtectionFunctionCallCodeHelper extends AbstractCustomCodeHel
 
     /**
      * @param {string} debugProtectionFunctionName
-     * @param {string} callsControllerFunctionName
      */
-    public initialize (debugProtectionFunctionName: string, callsControllerFunctionName: string): void {
+    public initialize (debugProtectionFunctionName: string): void {
         this.debugProtectionFunctionName = debugProtectionFunctionName;
-        this.callsControllerFunctionName = callsControllerFunctionName;
     }
 
     /**
@@ -75,9 +67,8 @@ export class DebugProtectionFunctionCallCodeHelper extends AbstractCustomCodeHel
      * @returns {string}
      */
     protected getCodeHelperTemplate (): string {
-        return this.customCodeHelperFormatter.formatTemplate(DebugProtectionFunctionCallTemplate(), {
-            debugProtectionFunctionName: this.debugProtectionFunctionName,
-            callControllerFunctionName: this.callsControllerFunctionName
+        return this.customCodeHelperFormatter.formatTemplate(DebugProtectionFunctionIntervalTemplate(), {
+            debugProtectionFunctionName: this.debugProtectionFunctionName
         });
     }
 }

@@ -9,21 +9,19 @@ import { ICustomCodeHelperObfuscator } from '../../interfaces/custom-code-helper
 import { IOptions } from '../../interfaces/options/IOptions';
 import { IRandomGenerator } from '../../interfaces/utils/IRandomGenerator';
 
+import { ObfuscationTarget } from '../../enums/ObfuscationTarget';
+
 import { initializable } from '../../decorators/Initializable';
 
-import { DebugProtectionFunctionCallTemplate } from './templates/debug-protection-function-call/DebugProtectionFunctionCallTemplate';
+import { DebuggerTemplate } from './templates/debug-protection-function/DebuggerTemplate';
+import { DebuggerTemplateNoEval } from './templates/debug-protection-function/DebuggerTemplateNoEval';
+import { DebugProtectionFunctionTemplate } from './templates/debug-protection-function/DebugProtectionFunctionTemplate';
 
 import { AbstractCustomCodeHelper } from '../AbstractCustomCodeHelper';
 import { NodeUtils } from '../../node/NodeUtils';
 
 @injectable()
-export class DebugProtectionFunctionCallCodeHelper extends AbstractCustomCodeHelper {
-    /**
-     * @type {string}
-     */
-    @initializable()
-    private callsControllerFunctionName!: string;
-
+export class DebugProtectionFunctionCodeHelper extends AbstractCustomCodeHelper {
     /**
      * @type {string}
      */
@@ -56,11 +54,9 @@ export class DebugProtectionFunctionCallCodeHelper extends AbstractCustomCodeHel
 
     /**
      * @param {string} debugProtectionFunctionName
-     * @param {string} callsControllerFunctionName
      */
-    public initialize (debugProtectionFunctionName: string, callsControllerFunctionName: string): void {
+    public initialize (debugProtectionFunctionName: string): void {
         this.debugProtectionFunctionName = debugProtectionFunctionName;
-        this.callsControllerFunctionName = callsControllerFunctionName;
     }
 
     /**
@@ -75,9 +71,13 @@ export class DebugProtectionFunctionCallCodeHelper extends AbstractCustomCodeHel
      * @returns {string}
      */
     protected getCodeHelperTemplate (): string {
-        return this.customCodeHelperFormatter.formatTemplate(DebugProtectionFunctionCallTemplate(), {
-            debugProtectionFunctionName: this.debugProtectionFunctionName,
-            callControllerFunctionName: this.callsControllerFunctionName
+        const debuggerTemplate: string = this.options.target !== ObfuscationTarget.BrowserNoEval
+            ? DebuggerTemplate()
+            : DebuggerTemplateNoEval();
+
+        return this.customCodeHelperFormatter.formatTemplate(DebugProtectionFunctionTemplate(), {
+            debuggerTemplate,
+            debugProtectionFunctionName: this.debugProtectionFunctionName
         });
     }
 }
