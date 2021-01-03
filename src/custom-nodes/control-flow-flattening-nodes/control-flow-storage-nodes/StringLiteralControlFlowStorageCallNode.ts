@@ -1,8 +1,6 @@
 import { inject, injectable, } from 'inversify';
 import { ServiceIdentifiers } from '../../../container/ServiceIdentifiers';
 
-import type * as ESTree from 'estree';
-
 import { TIdentifierNamesGeneratorFactory } from '../../../types/container/generators/TIdentifierNamesGeneratorFactory';
 import { TStatement } from '../../../types/node/TStatement';
 
@@ -17,13 +15,7 @@ import { NodeFactory } from '../../../node/NodeFactory';
 import { NodeUtils } from '../../../node/NodeUtils';
 
 @injectable()
-export class CallExpressionControlFlowStorageCallNode extends AbstractCustomNode {
-    /**
-     * @type {Expression}
-     */
-    @initializable()
-    private callee!: ESTree.Expression;
-
+export class StringLiteralControlFlowStorageCallNode extends AbstractCustomNode {
     /**
      * @type {string}
      */
@@ -35,12 +27,6 @@ export class CallExpressionControlFlowStorageCallNode extends AbstractCustomNode
      */
     @initializable()
     private controlFlowStorageName!: string;
-
-    /**
-     * @type {(ESTree.Expression | ESTree.SpreadElement)[]}
-     */
-    @initializable()
-    private expressionArguments!: (ESTree.Expression | ESTree.SpreadElement)[];
 
     /**
      * @param {TIdentifierNamesGeneratorFactory} identifierNamesGeneratorFactory
@@ -66,19 +52,13 @@ export class CallExpressionControlFlowStorageCallNode extends AbstractCustomNode
     /**
      * @param {string} controlFlowStorageName
      * @param {string} controlFlowStorageKey
-     * @param {Expression} callee
-     * @param {(Expression | SpreadElement)[]} expressionArguments
      */
     public initialize (
         controlFlowStorageName: string,
-        controlFlowStorageKey: string,
-        callee: ESTree.Expression,
-        expressionArguments: (ESTree.Expression | ESTree.SpreadElement)[]
+        controlFlowStorageKey: string
     ): void {
         this.controlFlowStorageName = controlFlowStorageName;
         this.controlFlowStorageKey = controlFlowStorageKey;
-        this.callee = callee;
-        this.expressionArguments = expressionArguments;
     }
 
     /**
@@ -86,15 +66,9 @@ export class CallExpressionControlFlowStorageCallNode extends AbstractCustomNode
      */
     protected getNodeStructure (): TStatement[] {
         const structure: TStatement = NodeFactory.expressionStatementNode(
-            NodeFactory.callExpressionNode(
-                NodeFactory.memberExpressionNode(
-                    NodeFactory.identifierNode(this.controlFlowStorageName),
-                    NodeFactory.identifierNode(this.controlFlowStorageKey)
-                ),
-                [
-                    this.callee,
-                    ...this.expressionArguments
-                ]
+            NodeFactory.memberExpressionNode(
+                NodeFactory.identifierNode(this.controlFlowStorageName),
+                NodeFactory.identifierNode(this.controlFlowStorageKey)
             )
         );
 
