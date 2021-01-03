@@ -1,7 +1,7 @@
 import { inject, injectable, } from 'inversify';
 import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 
-import type { BinaryOperator } from 'estree';
+import type { LogicalOperator } from 'estree';
 
 import { TIdentifierNamesGeneratorFactory } from '../../types/container/generators/TIdentifierNamesGeneratorFactory';
 import { TStatement } from '../../types/node/TStatement';
@@ -15,11 +15,11 @@ import { NodeFactory } from '../../node/NodeFactory';
 import { NodeUtils } from '../../node/NodeUtils';
 
 @injectable()
-export class BinaryExpressionFunctionNode extends AbstractCustomNode {
+export class LogicalExpressionFunctionNode extends AbstractCustomNode {
     /**
-     * @type {BinaryOperator}
+     * @type {LogicalOperator}
      */
-    private operator!: BinaryOperator;
+    private operator!: LogicalOperator;
 
     /**
      * @param {TIdentifierNamesGeneratorFactory} identifierNamesGeneratorFactory
@@ -43,9 +43,9 @@ export class BinaryExpressionFunctionNode extends AbstractCustomNode {
     }
 
     /**
-     * @param {BinaryOperator} operator
+     * @param {LogicalOperator} operator
      */
-    public initialize (operator: BinaryOperator): void {
+    public initialize (operator: LogicalOperator): void {
         this.operator = operator;
     }
 
@@ -61,7 +61,7 @@ export class BinaryExpressionFunctionNode extends AbstractCustomNode {
                 ],
                 NodeFactory.blockStatementNode([
                     NodeFactory.returnStatementNode(
-                        NodeFactory.binaryExpressionNode(
+                        NodeFactory.logicalExpressionNode(
                             this.operator,
                             NodeFactory.identifierNode('x'),
                             NodeFactory.identifierNode('y')

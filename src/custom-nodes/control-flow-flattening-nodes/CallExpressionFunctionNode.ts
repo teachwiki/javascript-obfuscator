@@ -1,7 +1,7 @@
 import { inject, injectable, } from 'inversify';
 import { ServiceIdentifiers } from '../../container/ServiceIdentifiers';
 
-import type { BinaryOperator } from 'estree';
+import * as ESTree from 'estree';
 
 import { TIdentifierNamesGeneratorFactory } from '../../types/container/generators/TIdentifierNamesGeneratorFactory';
 import { TStatement } from '../../types/node/TStatement';
@@ -10,16 +10,19 @@ import { ICustomCodeHelperFormatter } from '../../interfaces/custom-code-helpers
 import { IOptions } from '../../interfaces/options/IOptions';
 import { IRandomGenerator } from '../../interfaces/utils/IRandomGenerator';
 
+import { initializable } from '../../decorators/Initializable';
+
 import { AbstractCustomNode } from '../AbstractCustomNode';
 import { NodeFactory } from '../../node/NodeFactory';
 import { NodeUtils } from '../../node/NodeUtils';
 
 @injectable()
-export class BinaryExpressionFunctionNode extends AbstractCustomNode {
+export class CallExpressionFunctionNode extends AbstractCustomNode {
     /**
-     * @type {BinaryOperator}
+     * @type {(ESTree.Expression | ESTree.SpreadElement)[]}
      */
-    private operator!: BinaryOperator;
+    @initializable()
+    private expressionArguments!: (ESTree.Expression | ESTree.SpreadElement)[];
 
     /**
      * @param {TIdentifierNamesGeneratorFactory} identifierNamesGeneratorFactory
@@ -43,28 +46,35 @@ export class BinaryExpressionFunctionNode extends AbstractCustomNode {
     }
 
     /**
-     * @param {BinaryOperator} operator
+     * @param {(Expression | SpreadElement)[]} expressionArguments
      */
-    public initialize (operator: BinaryOperator): void {
-        this.operator = operator;
+    public initialize (expressionArguments: (ESTree.Expression | ESTree.SpreadElement)[]): void {
+        this.expressionArguments = expressionArguments;
     }
 
     /**
      * @returns {TStatement[]}
      */
     protected getNodeStructure (): TStatement[] {
+        const calleeIdentifier: ESTree.Identifier = NodeFactory.identifierNode('callee');
+        const params: ESTree.Identifier[] = [];
+        const argumentsLength: number = this.expressionArguments.length;
+
+        for (let i: number = 0; i < argumentsLength; i++) {
+            params.push(NodeFactory.identifierNode(`param${i + 1}`));
+        }
+
         const structure: TStatement = NodeFactory.expressionStatementNode(
             NodeFactory.functionExpressionNode(
                 [
-                    NodeFactory.identifierNode('x'),
-                    NodeFactory.identifierNode('y')
+                    calleeIdentifier,
+                    ...params
                 ],
                 NodeFactory.blockStatementNode([
                     NodeFactory.returnStatementNode(
-                        NodeFactory.binaryExpressionNode(
-                            this.operator,
-                            NodeFactory.identifierNode('x'),
-                            NodeFactory.identifierNode('y')
+                        NodeFactory.callExpressionNode(
+                            calleeIdentifier,
+                            params
                         )
                     )
                 ])
