@@ -4,37 +4,33 @@ import * as ESTree from 'estree';
 
 import { IOptions } from '../../../interfaces/options/IOptions';
 import { IRandomGenerator } from '../../../interfaces/utils/IRandomGenerator';
-import { IStringArrayIndexNode } from '../../../interfaces/custom-nodes/string-array-nodes/IStringArrayIndexNode';
 
 import { ServiceIdentifiers } from '../../../container/ServiceIdentifiers';
 
+import { AbstractStringArrayIndexNode } from './AbstractStringArrayIndexNode';
+import { NodeFactory } from '../../../node/NodeFactory';
+import { NumberUtils } from '../../../utils/NumberUtils';
+
 @injectable()
-export abstract class AbstractStringArrayIndexNode implements IStringArrayIndexNode {
-    /**
-     * @type {IOptions}
-     */
-    protected readonly options: IOptions;
-
-    /**
-     * @type {IRandomGenerator}
-     */
-    protected readonly randomGenerator: IRandomGenerator;
-
+export class StringArrayHexadecimalNumberIndexNode extends AbstractStringArrayIndexNode {
     /**
      * @param {IRandomGenerator} randomGenerator
      * @param {IOptions} options
      */
-    protected constructor (
+    public constructor (
         @inject(ServiceIdentifiers.IRandomGenerator) randomGenerator: IRandomGenerator,
         @inject(ServiceIdentifiers.IOptions) options: IOptions
     ) {
-        this.randomGenerator = randomGenerator;
-        this.options = options;
+        super(randomGenerator, options);
     }
 
     /**
      * @param {number} index
      * @returns {Expression}
      */
-    public abstract getNode (index: number): ESTree.Expression;
+    public getNode (index: number): ESTree.Expression {
+        const hexadecimalIndex: string = NumberUtils.toHex(index);
+
+        return NodeFactory.literalNode(index, hexadecimalIndex);
+    }
 }
