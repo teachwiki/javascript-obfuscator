@@ -3,13 +3,13 @@
  *
  * @returns {string}
  */
-export function SelfDefendingNoEvalTemplate (): string {
+export function SelfDefendingTemplate (): string {
     return `
         const {selfDefendingFunctionName} = {callControllerFunctionName}(this, function () {
-            {globalVariableTemplate}
-        
             const test = function () {
-                const regExp = new that.RegExp('^([^ ]+( +[^ ]+)+)+[^ ]}');
+                const regExp = test
+                    .constructor('return /" + this + "/')()
+                    .constructor('^([^ ]+( +[^ ]+)+)+[^ ]}');
                 
                 return !regExp.test({selfDefendingFunctionName});
             };
